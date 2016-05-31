@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.flatironschool.javacs;
 
@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  * Implementation of a Map using a binary search tree.
- * 
+ *
  * @param <K>
  * @param <V>
  *
@@ -32,7 +32,7 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		public V value;
 		public Node left = null;
 		public Node right = null;
-		
+
 		/**
 		 * @param key
 		 * @param value
@@ -44,7 +44,7 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 			this.value = value;
 		}
 	}
-		
+
 	@Override
 	public void clear() {
 		size = 0;
@@ -57,8 +57,8 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	}
 
 	/**
-	 * Returns the entry that contains the target key, or null if there is none. 
-	 * 
+	 * Returns the entry that contains the target key, or null if there is none.
+	 *
 	 * @param target
 	 */
 	private Node findNode(Object target) {
@@ -66,19 +66,26 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		if (target == null) {
             throw new NullPointerException();
 	    }
-		
+
 		// something to make the compiler happy
 		@SuppressWarnings("unchecked")
 		Comparable<? super K> k = (Comparable<? super K>) target;
-		
-		// the actual search
-        // TODO: Fill this in.
+		Node node = root;
+        while (node != null) {
+            int cmp = k.compareTo(node.key);
+            if (cmp < 0)
+                node = node.left;
+            else if (cmp > 0)
+                node = node.right;
+            else
+                return node;
+        }
         return null;
 	}
 
 	/**
 	 * Compares two keys or two values, handling null correctly.
-	 * 
+	 *
 	 * @param target
 	 * @param obj
 	 * @return
@@ -91,9 +98,26 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	}
 
 	@Override
+
 	public boolean containsValue(Object target) {
-		return false;
-	}
+ 		return containsValueHelper(root, target);
+ 	}
+
+	public boolean containsValueHelper(Node root, Object target) {
+		if (root == null) {
+		 			return false;
+		 		}
+		 		if (equals(target, root.value)) {
+		 			return true;
+		 		}
+		 		if (containsValueHelper(root.left, target)) {
+		 			return true;
+		 		}
+		 		if (containsValueHelper(root.right, target)) {
+		 			return true;
+		 		}
+		  		return false;
+		  	}
 
 	@Override
 	public Set<Map.Entry<K, V>> entrySet() {
@@ -117,9 +141,16 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	@Override
 	public Set<K> keySet() {
 		Set<K> set = new LinkedHashSet<K>();
-        // TODO: Fill this in.
+		addInOrder(root, set);
 		return set;
 	}
+
+	private void addInOrder(Node node, Set<K> set) {
+ 		if (node == null) return;
+ 		addInOrder(node.left, set);
+ 		set.add(node.key);
+ 		addInOrder(node.right, set);
+ 	}
 
 	@Override
 	public V put(K key, V value) {
@@ -135,8 +166,31 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	}
 
 	private V putHelper(Node node, K key, V value) {
-        // TODO: Fill this in.
-        return null;
+		@SuppressWarnings("unchecked")
+ 		Comparable<? super K> k = (Comparable<? super K>) key;
+ 		int cmp = k.compareTo(node.key);
+
+ 		if (cmp < 0) {
+ 			if (node.left == null) {
+ 				node.left = new Node(key, value);
+ 				size++;
+ 				return null;
+ 			} else {
+ 				return putHelper(node.left, key, value);
+ 			}
+ 		}
+ 		if (cmp > 0) {
+ 			if (node.right == null) {
+ 				node.right = new Node(key, value);
+ 				size++;
+ 				return null;
+ 			} else {
+ 				return putHelper(node.right, key, value);
+ 			}
+ 		}
+ 		V oldValue = node.value;
+ 		node.value = value;
+ 		return oldValue;
 	}
 
 	@Override
@@ -170,7 +224,7 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		}
 		return set;
 	}
-	
+
 	/**
 	 * @param args
 	 */
@@ -180,7 +234,7 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		map.put("Word2", 2);
 		Integer value = map.get("Word1");
 		System.out.println(value);
-		
+
 		for (String key: map.keySet()) {
 			System.out.println(key + ", " + map.get(key));
 		}
@@ -188,9 +242,9 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 
 	/**
 	 * Makes a node.
-	 * 
+	 *
 	 * This is only here for testing purposes.  Should not be used otherwise.
-	 * 
+	 *
 	 * @param key
 	 * @param value
 	 * @return
@@ -201,9 +255,9 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 
 	/**
 	 * Sets the instance variables.
-	 * 
+	 *
 	 * This is only here for testing purposes.  Should not be used otherwise.
-	 * 
+	 *
 	 * @param node
 	 * @param size
 	 */
@@ -214,9 +268,9 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 
 	/**
 	 * Returns the height of the tree.
-	 * 
+	 *
 	 * This is only here for testing purposes.  Should not be used otherwise.
-	 * 
+	 *
 	 * @return
 	 */
 	public int height() {
